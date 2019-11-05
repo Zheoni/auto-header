@@ -1,0 +1,4 @@
+*.o
+*.out
+auto-header
+tests/
