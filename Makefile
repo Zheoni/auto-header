@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++17 -Wall -O3
 
 VPATH = . ./parsegar/
 
-OBJS = parsegar.o template-support.o
+OBJS = parsegar.o template-support.o sysutils.o
 EXES = auto-header
 
 all: $(EXES)
