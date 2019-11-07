@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include "parsegar/parsegar.hpp"
+#include "template-support.hpp"
 
 struct config {
     bool verbose;
@@ -32,7 +33,7 @@ void processFile(const std::filesystem::path& path) {
 
     if (file.is_open()) {
         std::string firstLine;
-        file >> firstLine;
+        getline(file, firstLine);
 
         size_t keyPos = firstLine.find("$AH$");
 
@@ -68,7 +69,7 @@ void addHeader(std::fstream& file, const std::filesystem::path& filePath,
     std::stringstream buffer;
     buffer << file.rdbuf();
 
-    std::string header = comment + description;
+    std::string header = fillTemplate(".ahtemplate", comment, description, filePath);
 
     file.close();
 
@@ -77,7 +78,7 @@ void addHeader(std::fstream& file, const std::filesystem::path& filePath,
     if (newFile.is_open()) {
         newFile << header;
         newFile << buffer.rdbuf();
-    } 
+    }
 
     newFile.close();
 }

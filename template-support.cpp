@@ -1,4 +1,5 @@
 #include "template-support.hpp"
+#include "sysutils.hpp"
 
 #include <fstream>
 #include <ctime>
@@ -10,8 +11,8 @@ std::string fillKeyProperty(const std::string& name,
         return description;
     else if (name == "$fn")
         return path.filename().c_str();
-    // else if (name == "$us") // DO?
-    //     return ""
+    else if (name == "$us")
+        return getUsername();
     else if (name == "$di")
         return path.parent_path().c_str(); // Can be wrong, test and correct
     else if (name == "$da") {
@@ -31,7 +32,8 @@ std::string fillKeyProperty(const std::string& name,
 
 std::string fillTemplate(const std::filesystem::path& templatePath,
                          const std::string comment,
-                         const std::string description) {
+                         const std::string description,
+                         const std::filesystem::path& filePath) {
     const char key = '$';
 
     std::ifstream templateFile(templatePath);
@@ -49,7 +51,7 @@ std::string fillTemplate(const std::filesystem::path& templatePath,
             std::string property;
             while (keyPos != std::string::npos) {
                 property = fillKeyProperty(line.substr(keyPos, 3), description,
-                                           templatePath);
+                                           filePath);
 
                 filledTemplate += property;
 
