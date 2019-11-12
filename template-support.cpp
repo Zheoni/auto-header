@@ -14,7 +14,7 @@ std::string fillKeyProperty(const std::string& name,
     else if (name == "$us")
         return getUsername();
     else if (name == "$di")
-        return path.parent_path().c_str(); // Can be wrong, test and correct
+        return path.parent_path().filename().c_str(); // maybe wrong for a file in / directory?
     else if (name == "$da") {
         time_t rawtime;
         struct tm* time_info;

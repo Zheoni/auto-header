@@ -8,6 +8,7 @@
 struct config {
     bool verbose;
     bool recursive;
+    bool keep;
     std::filesystem::path path;
 };
 
@@ -73,7 +74,13 @@ void addHeader(std::fstream& file, const std::filesystem::path& filePath,
 
     file.close();
 
-    std::ofstream newFile(filePath); // Maybe do it in a copy and then restore if something go wrong?
+    std::ofstream newFile;
+    if (programConfig.keep) {
+        std::string newFilename = filePath.stem().string() + 'h' + filePath.extension().string();
+        newFile.open(filePath.filename().replace_filename(newFilename));
+    } else {
+        newFile.open(filePath);
+    }
 
     if (newFile.is_open()) {
         newFile << header;
@@ -88,7 +95,12 @@ config parseInput(int argc, const char** argv) {
 
     argsConfig argConf;
     argConf.addFlag("-v");
+    argConf.addFlag("--verbose");
     argConf.addFlag("-r");
+    argConf.addFlag("--recursive");
+    argConf.addFlag("-k");
+    argConf.addFlag("--keep");
+
     argConf.addArgument("-p");
 
     argsParser args(argConf, argc, argv);
@@ -101,8 +113,9 @@ config parseInput(int argc, const char** argv) {
         programConfig.path = inputPath;
     }
 
-    programConfig.verbose = args.getFlag("-v");
-    programConfig.recursive = args.getFlag("-r");
+    programConfig.verbose = args.getFlag("-v") || args.getFlag("--verbose");
+    programConfig.recursive = args.getFlag("-r") || args.getFlag("--recursive");
+    programConfig.keep = args.getFlag("-k") || args.getFlag("--keep");
 
     return programConfig;
 }
