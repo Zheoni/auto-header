@@ -65,6 +65,9 @@ std::string fillTemplate(const std::filesystem::path& templatePath,
     const char key = '$';
 
     std::ifstream templateFile(templatePath);
+    if (!templateFile.is_open()) {
+        throw std::invalid_argument("Cannot find/open template file with name \".ahtemplate\".");
+    }
     std::string line, filledTemplate;
 
     while (getline(templateFile, line)) {

@@ -40,7 +40,11 @@ int main(int argc, const char** argv) {
     } else if (programConfig.listMacros) {
         listMacros(std::cout);
     } else {
-        processDirectory(programConfig.path);
+        try {
+            processDirectory(programConfig.path);
+        } catch(std::exception& e) {
+            std::cerr << e.what() << std::endl;
+        }
     }
     return 0;
 }
@@ -90,8 +94,14 @@ void addHeader(std::fstream& file, const std::filesystem::path& filePath,
     std::stringstream buffer;
     buffer << file.rdbuf();
 
-    std::string header =
-        fillTemplate(".ahtemplate", comment, description, filePath, programConfig.path);
+    std::string header;
+
+    try {
+        header = fillTemplate(".ahtemplate", comment, description, filePath, programConfig.path);
+    } catch (std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        return;
+    }
 
     file.close();
 
