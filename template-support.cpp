@@ -31,15 +31,16 @@ $di => The name of the base folder auto-header is running.\n";
 
 std::string fillKeyProperty(const std::string& name,
                             const std::string& description,
-                            const std::filesystem::path& path) {
+                            const std::filesystem::path& filepath,
+                            const std::filesystem::path& basepath) {
     if (name == "$de")
         return description;
     else if (name == "$fn")
-        return path.filename().c_str();
+        return filepath.filename().c_str();
     else if (name == "$us")
         return getUsername();
     else if (name == "$di")
-        return path.parent_path().filename().c_str(); // maybe wrong for a file in / directory?
+        return basepath.filename().c_str();  // maybe wrong for a file in / directory?
     else if (name == "$da") {
         time_t rawtime;
         struct tm* time_info;
@@ -48,17 +49,19 @@ std::string fillKeyProperty(const std::string& name,
         time_info = localtime(&rawtime);
 
         return std::string(std::to_string(time_info->tm_mon + 1) + '/' +
-                              std::to_string(time_info->tm_mday) + '/' +
-                              std::to_string(time_info->tm_year + 1900));
+                           std::to_string(time_info->tm_mday) + '/' +
+                           std::to_string(time_info->tm_year + 1900));
     } else if (name[1] == 'l')
         return std::string(20, name[2]);
-    else return name;
+    else
+        return name;
 }
 
 std::string fillTemplate(const std::filesystem::path& templatePath,
                          const std::string comment,
                          const std::string description,
-                         const std::filesystem::path& filePath) {
+                         const std::filesystem::path& filePath,
+                         const std::filesystem::path& basepath) {
     const char key = '$';
 
     std::ifstream templateFile(templatePath);
@@ -76,7 +79,7 @@ std::string fillTemplate(const std::filesystem::path& templatePath,
             std::string property;
             while (keyPos != std::string::npos) {
                 property = fillKeyProperty(line.substr(keyPos, 3), description,
-                                           filePath);
+                                           filePath, basepath);
 
                 filledTemplate += property;
 

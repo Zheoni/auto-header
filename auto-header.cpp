@@ -90,7 +90,8 @@ void addHeader(std::fstream& file, const std::filesystem::path& filePath,
     std::stringstream buffer;
     buffer << file.rdbuf();
 
-    std::string header = fillTemplate(".ahtemplate", comment, description, filePath);
+    std::string header =
+        fillTemplate(".ahtemplate", comment, description, filePath, programConfig.path);
 
     file.close();
 
