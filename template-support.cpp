@@ -4,6 +4,31 @@
 #include <fstream>
 #include <ctime>
 
+void createExampleTemplate(const std::filesystem::path& atPath) {
+    static constexpr const char* content =
+        "$l=\n\
+FILENAME: $fn\n\
+DESCRIPTION: $de\n\
+DATE: $da\n\
+AUTHOR: $us\n\
+PROJECT: $di\n\
+$l=\n";
+
+    std::ofstream file(atPath.string() + "/.ahtemplate.example");
+    file << content;
+    file.close();
+}
+
+void listMacros(std::ostream& os) {
+    static constexpr const char* macros = "$lC => Creates a line by repeating the 'C' character, it can be any character.\n\
+$fn => The name of the current file.\n\
+$de => The description, a phrase in the comment after the $AH$.\n\
+$da => The current date.\n\
+$us => The name of the user running auto-header.\n\
+$di => The name of the base folder auto-header is running.\n";
+    os << macros;
+}
+
 std::string fillKeyProperty(const std::string& name,
                             const std::string& description,
                             const std::filesystem::path& path) {

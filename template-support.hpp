@@ -4,7 +4,9 @@
 #include <string>
 #include <filesystem>
 
-void createExampleTemplate();
+void createExampleTemplate(const std::filesystem::path& atPath);
+
+void listMacros(std::ostream& os);
 
 std::string fillTemplate(const std::filesystem::path& templatePath,
                          const std::string comment,
