@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <exception>
+#include <vector>
 #include "parsegar/parsegar.hpp"
 #include "template-support.hpp"
 
@@ -42,7 +43,7 @@ int main(int argc, const char** argv) {
     } else {
         try {
             processDirectory(programConfig.path);
-        } catch(std::exception& e) {
+        } catch (std::exception& e) {
             std::cerr << e.what() << std::endl;
         }
     }
@@ -94,10 +95,29 @@ void addHeader(std::fstream& file, const std::filesystem::path& filePath,
     std::stringstream buffer;
     buffer << file.rdbuf();
 
+    static const std::vector<const std::string> templateContent = [&]() {
+        std::ifstream templateFile(".ahtemplate");
+        if (!templateFile.is_open()) {
+            throw std::invalid_argument(
+                "Cannot find/open template file with name \".ahtemplate\".");
+        }
+        std::stringstream buffer;
+        buffer << templateFile.rdbuf();
+
+        std::string line;
+        std::vector<const std::string> lines;
+        while (std::getline(buffer, line)) {
+            lines.emplace_back(line);
+        }
+
+        return lines;
+    }();
+
     std::string header;
 
     try {
-        header = fillTemplate(".ahtemplate", comment, description, filePath, programConfig.path);
+        header = fillTemplate(templateContent, comment, description, filePath,
+                              programConfig.path);
     } catch (std::exception& e) {
         std::cerr << e.what() << std::endl;
         return;
@@ -159,9 +179,8 @@ config parseInput(int argc, const char** argv) {
     if (programConfig.createExample && programConfig.listMacros) {
         throw std::invalid_argument(
             "--create-example and --list-macros can't be put together.");
-    } else if ((programConfig.createExample ||
-               programConfig.listMacros) && (programConfig.recursive ||
-               programConfig.keep)) {
+    } else if ((programConfig.createExample || programConfig.listMacros) &&
+               (programConfig.recursive || programConfig.keep)) {
         throw std::invalid_argument(
             "--create-example and --list-macros can't be with the recursive or "
             "the keep flag");
@@ -171,7 +190,8 @@ config parseInput(int argc, const char** argv) {
 }
 
 void printHelp(std::ostream& os) {
-    static constexpr const char* helpstr = "auto-header [options]\n\
+    static constexpr const char* helpstr =
+        "auto-header [options]\n\
 \t-h / --help\t\tThis list\n\
 \t--create-example\tCreates an example template\n\
 \t--list-macros\t\tList all the available macros to use inside a template\n\

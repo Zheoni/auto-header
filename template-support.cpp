@@ -20,7 +20,8 @@ $l=\n";
 }
 
 void listMacros(std::ostream& os) {
-    static constexpr const char* macros = "$lC => Creates a line by repeating the 'C' character, it can be any character.\n\
+    static constexpr const char* macros =
+        "$lC => Creates a line by repeating the 'C' character, it can be any character.\n\
 $fn => The name of the current file.\n\
 $de => The description, a phrase in the comment after the $AH$.\n\
 $da => The current date.\n\
@@ -40,7 +41,8 @@ std::string fillKeyProperty(const std::string& name,
     else if (name == "$us")
         return getUsername();
     else if (name == "$di")
-        return basepath.filename().c_str();  // maybe wrong for a file in / directory?
+        return basepath.filename()
+            .c_str();  // maybe wrong for a file in / directory?
     else if (name == "$da") {
         time_t rawtime;
         struct tm* time_info;
@@ -57,20 +59,16 @@ std::string fillKeyProperty(const std::string& name,
         return name;
 }
 
-std::string fillTemplate(const std::filesystem::path& templatePath,
+std::string fillTemplate(const std::vector<const std::string>& templateContent,
                          const std::string comment,
                          const std::string description,
                          const std::filesystem::path& filePath,
                          const std::filesystem::path& basepath) {
     const char key = '$';
 
-    std::ifstream templateFile(templatePath);
-    if (!templateFile.is_open()) {
-        throw std::invalid_argument("Cannot find/open template file with name \".ahtemplate\".");
-    }
-    std::string line, filledTemplate;
+    std::string filledTemplate;
 
-    while (getline(templateFile, line)) {
+    for (const std::string& line : templateContent) {
         size_t keyPos = line.find(key);
         size_t lastWritten = 0;
 
