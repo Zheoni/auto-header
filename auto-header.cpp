@@ -96,7 +96,7 @@ void addHeader(std::fstream& file, const std::filesystem::path& filePath,
     buffer << file.rdbuf();
 
     static const std::vector<const std::string> templateContent = [&]() {
-        std::ifstream templateFile(".ahtemplate");
+        std::ifstream templateFile(programConfig.path.append(".ahtemplate"));
         if (!templateFile.is_open()) {
             throw std::invalid_argument(
                 "Cannot find/open template file with name \".ahtemplate\".");
